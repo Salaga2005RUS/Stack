@@ -1,10 +1,11 @@
 CC = g++
 FLAGS = -g -ggdb3
-DEBAG_FLAGS = -Wall -Wextra
+DEBUG_FLAGS = -Wall -Wextra
 ASSAN = -lasan -fsanitize=address
 
-FLAGS += $(DEBAG_FLAGS)
-#FLAGS += $(ASSAN)
+
+FLAGS += $(DEBUG_FLAGS)
+FLAGS += $(ASSAN)
 
 
 all: stack

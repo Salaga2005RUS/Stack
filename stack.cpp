@@ -48,14 +48,14 @@ int StackPop (Stack *stk, elem_t *ret_value)
     stk->size--;
     if (stk->capacity >= 2 * MUL_DIV_COEF * stk->size) StackResize (stk, decrease);
 
-    return *ret_value;
+    return 0;
 }
 
 void StackResize (Stack *stk, IncreaseDecreaseMode mode)
 {
     if (mode == increase) stk->capacity *= MUL_DIV_COEF;
     else stk->capacity /= MUL_DIV_COEF;
-    stk->data = (elem_t *) realloc(stk->data, stk->capacity * sizeof (elem_t));
+    stk->data = (elem_t *) realloc (stk->data, stk->capacity * sizeof (elem_t));
 }
 
 void StackOK (Stack *stk)
