@@ -1,11 +1,11 @@
 CC = g++
 FLAGS = -g -ggdb3
-DEBUG_FLAGS = -Wall -Wextra
+DEBUG_FLAGS = -Wall -Wextra -D_DEBUG
 ASSAN = -lasan -fsanitize=address
-
+# /home/gr1nd3/.local/bin/colour-valgrind
 
 FLAGS += $(DEBUG_FLAGS)
-FLAGS += $(ASSAN)
+# FLAGS += $(ASSAN)
 
 
 all: stack
