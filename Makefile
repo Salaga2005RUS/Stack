@@ -1,6 +1,6 @@
-CC = g++
-FLAGS = -g -ggdb3
-DEBUG_FLAGS = -Wall -Wextra -D_DEBUG
+CC = g++ 
+FLAGS = -g -ggdb3 -D_DEBUG
+DEBUG_FLAGS = -Wall -Wextra 
 ASSAN = -lasan -fsanitize=address
 # /home/gr1nd3/.local/bin/colour-valgrind
 
