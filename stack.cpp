@@ -56,10 +56,10 @@ int StackPop (Stack *stk, elem_t *ret_value)
 
     if (stk->size == 0) return 0; //TODO return value is same for good and bad situation
 
+    stk->size--;
     *ret_value = stk->data[stk->size];
     stk->data[stk->size] = 0;
-    stk->size--;
-
+    
     if (stk->capacity >= 2 * MUL_DIV_COEF * stk->size) StackResize (stk, decrease);
 
     MakeHash (stk);
@@ -132,7 +132,6 @@ void CanaryPtrMoving (Stack *stk)
 
 unsigned int HashFAQ6 (const char* str, int size)
 {
-
     unsigned int hash = 0;
 
     for (; size > 0; str++)
@@ -147,25 +146,30 @@ unsigned int HashFAQ6 (const char* str, int size)
     hash ^= (hash >> 11);
     hash += (hash << 15);
     
+    printf ("%u\n", hash);
     return hash;
 }
 
 unsigned int HashOfStack (Stack *stk)
 {
+    printf ("h:");
     char* h_stk_ptr = (char*) stk;
-    return HashFAQ6(h_stk_ptr, sizeof (*(stk)));
+    return HashFAQ6(h_stk_ptr, sizeof (stk));
 }
 
 unsigned int HashOfData (Stack *stk)
 {
-    char* h_data_ptr = (char*) ((canary_t*) stk->data - 1);
+    printf ("h_d:");
+    char* h_data_ptr = (char*) stk->data - sizeof(canary_t);
     return HashFAQ6(h_data_ptr, stk->capacity * sizeof (elem_t) + 2 * sizeof (canary_t));
 }
 
 void MakeHash (Stack *stk)
 {
-   stk->hash_stk    = HashOfStack (stk);
-   stk->hash_data   = HashOfData (stk);
+    printf ("---\n");
+    stk->hash_data   = HashOfData (stk);
+    stk->hash_stk    = HashOfStack (stk);
+    printf ("---\n");
 }
 
 
@@ -175,25 +179,36 @@ void MakeHash (Stack *stk)
 int StackValidator (Stack *stk)
 {
     int magic_error_number = 0;
+    unsigned int old_hash = stk->hash_stk;
+    unsigned int new_hash = HashOfStack (stk);
+    printf ("old[%u] new[%u]\n", old_hash, new_hash);
 
-    if (stk == NULL)                                               magic_error_number += error_stack_ptr;
-    if (stk->data == NULL)                                         magic_error_number += error_array_ptr;
-    if (stk->size <= 0)                                            magic_error_number += error_stack_size;
-    if (stk->capacity <= 0)                                        magic_error_number += error_stack_capacity;
+    if (stk == NULL)                                                magic_error_number += error_stack_ptr;
+    if (stk->data == NULL)                                          magic_error_number += error_array_ptr;
+    if (stk->size < 0)                                              magic_error_number += error_stack_size;
+    if (stk->capacity <= 0)                                         magic_error_number += error_stack_capacity;
 
-    if (stk->hash_stk  != HashOfStack (stk) && 
-       (stk->hash_data != HashOfData (stk)))                       magic_error_number += hash_error_stack_data;
-    if (stk->hash_stk  != HashOfStack (stk))                       magic_error_number += hash_error_stack;
-    if (stk->hash_data != HashOfData (stk))                        magic_error_number += hash_error_data;
+    if (old_hash  != new_hash && 
+       (stk->hash_data != HashOfData (stk)))                        magic_error_number += hash_error_stack_data;
+    if (old_hash  != new_hash)                                      magic_error_number += hash_error_stack;
+    if (stk->hash_data != HashOfData (stk))                         magic_error_number += hash_error_data;
 
-    if (stk->canary_left   != stk->canary_reference)               magic_error_number += left_stack_canary_dead;
-    if (stk->canary_right  != stk->canary_reference)               magic_error_number += right_stack_canary_dead;
-    if (*(stk->canary_left_arr_ptr)    != stk->canary_reference)   magic_error_number += left_arr_canary_dead;
-    if (*(stk->canary_right_arr_ptr)   != stk->canary_reference)   magic_error_number += right_arr_canary_dead;
+    if (stk->canary_left   != stk->canary_reference)                magic_error_number += left_stack_canary_dead;
+    if (stk->canary_right  != stk->canary_reference)                magic_error_number += right_stack_canary_dead;
 
-    printf ("//////////////////////////\n"
-            "Stack validation code: %d\n"
-            "//////////////////////////\n", magic_error_number);
+    printf ("left       : %lld\n", *(stk->canary_left_arr_ptr));
+    printf ("right      : %lld\n", *(stk->canary_right_arr_ptr));
+    printf ("reference  : %lld\n", (stk->canary_reference));
+
+    if (*(stk->canary_left_arr_ptr)    != stk->canary_reference)    magic_error_number += left_arr_canary_dead;
+    if (*(stk->canary_right_arr_ptr)   != stk->canary_reference)
+    {
+        magic_error_number += right_arr_canary_dead;
+    }
+    printf ("=============================[%d]============================\n", magic_error_number);
+    // printf ("//////////////////////////\n"
+    //         "Stack validation code: %d\n"
+    //         "//////////////////////////\n", magic_error_number);
 
     return magic_error_number;
 }
