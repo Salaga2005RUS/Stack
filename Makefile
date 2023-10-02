@@ -5,7 +5,7 @@ ASSAN = -lasan -fsanitize=address
 # /home/gr1nd3/.local/bin/colour-valgrind
 
 FLAGS += $(DEBUG_FLAGS)
-# FLAGS += $(ASSAN)
+FLAGS += $(ASSAN)
 
 
 all: stack

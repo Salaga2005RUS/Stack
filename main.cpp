@@ -20,5 +20,8 @@ int main ()
         StackPop(&stack, &x);
         printf ("[%d] %d/%d\n", stack.data[stack.size - 1], stack.size, stack.capacity);
     }
+
+    StackDestroy(&stack);
+
     return 0;
 }

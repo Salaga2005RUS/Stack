@@ -133,7 +133,7 @@ void CanaryPtrMoving (Stack *stk) //TODO rename or
     stk->canary_left_arr_ptr = (canary_t*) stk->data;
     *(stk->canary_left_arr_ptr) = stk->canary_reference;
 
-    stk->canary_right_arr_ptr = (canary_t*) ((char*) stk->data + 2 * sizeof (canary_t) + stk->capacity * sizeof (elem_t));
+    stk->canary_right_arr_ptr = (canary_t*) ((char*) stk->data + sizeof (canary_t) + stk->capacity * sizeof (elem_t));
     *(stk->canary_right_arr_ptr) = stk->canary_reference;
     
     stk->data = (elem_t*) ((char*) stk->data + sizeof (canary_t));
